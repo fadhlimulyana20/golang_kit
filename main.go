@@ -1,10 +1,7 @@
 package main
 
 import (
-	"net/http"
-
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
+	"template/cmd"
 )
 
 // type StubDetails struct {
@@ -17,14 +14,7 @@ import (
 // 	path string
 // }
 
-func main() {
-	r := chi.NewRouter()
-	r.Use(middleware.Logger)
-	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("Hello World!"))
-	})
-	http.ListenAndServe(":3000", r)
-
+func Stubs() {
 	// var files []file
 	// err := filepath.Walk("./stubs",
 	// 	func(path string, info os.FileInfo, err error) error {
@@ -81,4 +71,8 @@ func main() {
 	// 	template.Execute(f, s.Values)
 
 	// }
+}
+
+func main() {
+	cmd.Execute()
 }
