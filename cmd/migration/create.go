@@ -16,6 +16,8 @@ func createMigration(name string) {
 	if err := goose.Create(db, migrationPath, name, "sql"); err != nil {
 		log.Fatal(err.Error())
 	}
+
+	defer db.Close()
 }
 
 var CreateMigrationCmd = &cobra.Command{

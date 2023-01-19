@@ -13,6 +13,8 @@ func migrate() {
 	if err := goose.Up(db, migrationPath); err != nil {
 		log.Fatal(err.Error())
 	}
+
+	defer db.Close()
 }
 
 var MigrateCmd = &cobra.Command{
