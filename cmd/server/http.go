@@ -1,16 +1,16 @@
 package server
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
 func startServer() {
-	fmt.Println("start server in port 3000")
+	log.Info("HTTP server running in port 3000")
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
