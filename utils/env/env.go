@@ -1,8 +1,6 @@
 package env
 
 import (
-	"fmt"
-	"os"
 	"path/filepath"
 
 	"github.com/joho/godotenv"
@@ -14,5 +12,5 @@ func init() {
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
-	log.Info(fmt.Sprintf("Run in %s mode", os.Getenv("ENV")))
+	// log.Info(fmt.Sprintf("Run in %s mode", os.Getenv("ENV")))
 }

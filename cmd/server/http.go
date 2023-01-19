@@ -1,10 +1,11 @@
 package server
 
 import (
+	"encoding/json"
 	"net/http"
+	m "template/cmd/server/middleware"
 
 	"github.com/go-chi/chi"
-	"github.com/go-chi/chi/middleware"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -12,9 +13,13 @@ import (
 func startServer() {
 	log.Info("HTTP server running in port 3000")
 	r := chi.NewRouter()
-	r.Use(middleware.Logger)
+	r.Use(m.Logger)
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("Hello World!"))
+		re := map[string]string{
+			"hello": "world",
+		}
+		res, _ := json.Marshal(re)
+		w.Write(res)
 	})
 	http.ListenAndServe(":3000", r)
 }

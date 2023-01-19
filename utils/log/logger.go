@@ -2,6 +2,7 @@ package log
 
 import (
 	"os"
+	"time"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -10,7 +11,7 @@ func init() {
 	// Log as JSON instead of the default ASCII formatter.
 	env := os.Getenv("ENV")
 	if env == "development" {
-		log.SetFormatter(&log.TextFormatter{})
+		log.SetFormatter(&log.TextFormatter{DisableTimestamp: false, TimestampFormat: time.UnixDate, FullTimestamp: true})
 	} else {
 		log.SetFormatter(&log.JSONFormatter{})
 	}
