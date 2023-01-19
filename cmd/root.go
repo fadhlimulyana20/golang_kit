@@ -3,8 +3,8 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"template/cmd/http"
 	"template/cmd/migration"
-	"template/cmd/server"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -39,7 +39,7 @@ func init() {
 	viper.SetDefault("author", "NAME HERE <EMAIL ADDRESS>")
 	viper.SetDefault("license", "apache")
 
-	rootCmd.AddCommand(server.StartServerCmd)
+	rootCmd.AddCommand(http.StartServerCmd)
 	rootCmd.AddCommand(migration.CreateMigrationCmd)
 	rootCmd.AddCommand(migration.MigrateCmd)
 }

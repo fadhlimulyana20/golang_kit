@@ -1,9 +1,9 @@
-package server
+package http
 
 import (
 	"encoding/json"
 	"net/http"
-	m "template/cmd/server/middleware"
+	m "template/cmd/http/middleware"
 
 	"github.com/go-chi/chi"
 	log "github.com/sirupsen/logrus"
