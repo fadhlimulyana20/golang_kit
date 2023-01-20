@@ -1,8 +1,11 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
 	"os"
+	"os/signal"
+	"syscall"
 	"template/cmd/http"
 	"template/cmd/migration"
 
@@ -29,6 +32,14 @@ func Execute() error {
 
 func init() {
 	cobra.OnInitialize(initConfig)
+	ctx, cancel := context.WithCancel(context.Background())
+
+	quit := make(chan os.Signal)
+	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
+	go func() {
+		<-quit
+		cancel()
+	}()
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.cobra.yaml)")
 	rootCmd.PersistentFlags().StringP("author", "a", "YOUR NAME", "author name for copyright attribution")
@@ -39,7 +50,17 @@ func init() {
 	viper.SetDefault("author", "NAME HERE <EMAIL ADDRESS>")
 	viper.SetDefault("license", "apache")
 
-	rootCmd.AddCommand(http.StartServerCmd)
+	comands := []*cobra.Command{
+		{
+			Use:   "serve",
+			Short: "Start HTTP server",
+			Long:  "Start HTTP Server",
+			Run: func(cmd *cobra.Command, args []string) {
+				http.StartServer(ctx)
+			},
+		},
+	}
+	rootCmd.AddCommand(comands...)
 	rootCmd.AddCommand(migration.CreateMigrationCmd)
 	rootCmd.AddCommand(migration.MigrateCmd)
 }
