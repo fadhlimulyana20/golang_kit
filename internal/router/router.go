@@ -1,7 +1,6 @@
 package router
 
 import (
-	"encoding/json"
 	"net/http"
 	m "template/internal/middleware"
 
@@ -18,16 +17,10 @@ func NewRouter() Router {
 	}
 }
 
-func (r *router) Route() http.Handler {
-	router := chi.NewRouter()
-	router.Use(m.Logger)
-	router.Get("/", func(w http.ResponseWriter, req *http.Request) {
-		re := map[string]string{
-			"hello": "world",
-		}
-		res, _ := json.Marshal(re)
-		w.Write(res)
-	})
+func (rtr *router) Route() http.Handler {
+	rtr.router.Use(m.Logger)
 
-	return router
+	rtr.router.Mount("/hello", rtr.helloRouter())
+
+	return rtr.router
 }
