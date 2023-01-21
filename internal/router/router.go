@@ -21,6 +21,7 @@ func (rtr *router) Route() http.Handler {
 	rtr.router.Use(m.Logger)
 
 	rtr.router.Mount("/hello", rtr.helloRouter())
+	rtr.router.Mount("/user", rtr.UserRouter())
 
 	return rtr.router
 }

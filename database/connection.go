@@ -7,6 +7,8 @@ import (
 
 	_ "github.com/lib/pq"
 	log "github.com/sirupsen/logrus"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
 func dsn() string {
@@ -33,6 +35,16 @@ func Connection() *sql.DB {
 	}
 
 	// defer db.Close()
+
+	return db
+}
+
+func ORM() *gorm.DB {
+	dsnConn := dsn()
+	db, err := gorm.Open(postgres.Open(dsnConn), &gorm.Config{})
+	if err != nil {
+		log.Fatal("ORM failed to connect to DB")
+	}
 
 	return db
 }
