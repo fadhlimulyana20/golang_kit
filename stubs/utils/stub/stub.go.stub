@@ -21,6 +21,11 @@ type file struct {
 	path string
 }
 
+var excludedPath = []string{
+	".git",
+	".github",
+}
+
 func MakeStubs() error {
 	err := os.RemoveAll("./stubs")
 	if err != nil {
@@ -34,8 +39,10 @@ func MakeStubs() error {
 			return err
 		}
 
-		if strings.Contains(path, ".git") {
-			return nil
+		for _, v := range excludedPath {
+			if strings.Contains(path, v) {
+				return nil
+			}
 		}
 
 		if !info.IsDir() {
@@ -111,7 +118,7 @@ func MakeStubs() error {
 	return nil
 }
 
-func Stubs() {
+func Stubs(module string) {
 	var files []file
 	err := filepath.Walk("./stubs",
 		func(path string, info os.FileInfo, err error) error {
@@ -140,9 +147,9 @@ func Stubs() {
 		s := StubDetails{
 			Name:        f.path,
 			FileName:    strings.ReplaceAll(f.name, ".stub", ""),
-			Destination: fmt.Sprintf("./%s/", strings.Join(destination[1:len(destination)-1], "/")),
+			Destination: fmt.Sprintf("./src/%s/%s/", module, strings.Join(destination[1:len(destination)-1], "/")),
 			Values: map[string]string{
-				"Model": "User",
+				"Module": module,
 			},
 		}
 

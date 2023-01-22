@@ -1,7 +1,13 @@
 package stub
 
-import "{{.Module}}/utils/stub"
+import (
+	"{{.Module}}/utils/stub"
+)
 
 func MakeStub() {
 	stub.MakeStubs()
+}
+
+func GenerateFromStub(module string) {
+	stub.Stubs(module)
 }

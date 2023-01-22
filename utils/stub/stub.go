@@ -21,6 +21,11 @@ type file struct {
 	path string
 }
 
+var excludedPath = []string{
+	".git",
+	".github",
+}
+
 func MakeStubs() error {
 	err := os.RemoveAll("./stubs")
 	if err != nil {
@@ -34,8 +39,10 @@ func MakeStubs() error {
 			return err
 		}
 
-		if strings.Contains(path, ".git") {
-			return nil
+		for _, v := range excludedPath {
+			if strings.Contains(path, v) {
+				return nil
+			}
 		}
 
 		if !info.IsDir() {
