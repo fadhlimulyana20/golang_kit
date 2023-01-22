@@ -6,9 +6,9 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-	"template/cmd/http"
-	"template/cmd/migration"
-	"template/cmd/stub"
+	"{{.Module}}/cmd/http"
+	"{{.Module}}/cmd/migration"
+	"{{.Module}}/cmd/stub"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -66,15 +66,6 @@ func init() {
 			Long:  "Make stubs file from source code",
 			Run: func(cmd *cobra.Command, args []string) {
 				stub.MakeStub()
-			},
-		},
-		{
-			Use:   "unstubilize [args]",
-			Short: "Make source code from stub files",
-			Long:  "Make source code from stub files",
-			Args:  cobra.MinimumNArgs(1),
-			Run: func(cmd *cobra.Command, args []string) {
-				stub.GenerateFromStub(args[0])
 			},
 		},
 	}

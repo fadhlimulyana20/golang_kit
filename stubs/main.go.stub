@@ -1,0 +1,11 @@
+package main
+
+import (
+	"{{.Module}}/cmd"
+	_ "{{.Module}}/utils/env"
+	_ "{{.Module}}/utils/log"
+)
+
+func main() {
+	cmd.Execute()
+}

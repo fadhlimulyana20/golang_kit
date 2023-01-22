@@ -1,0 +1,7 @@
+package stub
+
+import "{{.Module}}/utils/stub"
+
+func MakeStub() {
+	stub.MakeStubs()
+}
