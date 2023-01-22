@@ -14,7 +14,7 @@ import (
 )
 
 type user struct {
-	handler handler
+	handler Handler
 	usecase usecase.UserUsecase
 	name    string
 }

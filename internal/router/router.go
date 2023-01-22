@@ -19,6 +19,7 @@ func NewRouter() Router {
 
 func (rtr *router) Route() http.Handler {
 	rtr.router.Use(m.Logger)
+	rtr.router.Use(m.Authorization)
 
 	rtr.router.Mount("/hello", rtr.helloRouter())
 	rtr.router.Mount("/user", rtr.UserRouter())

@@ -9,9 +9,9 @@ import (
 
 // type response func(w http.ResponseWriter, resp appctx.Response, startTime time.Time)
 
-type handler struct{}
+type Handler struct{}
 
-func (h *handler) Response(w http.ResponseWriter, resp appctx.Response, startTime time.Time) {
+func (h *Handler) Response(w http.ResponseWriter, resp appctx.Response, startTime time.Time) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(resp.Code)
 	d, _ := json.Marshal(resp)

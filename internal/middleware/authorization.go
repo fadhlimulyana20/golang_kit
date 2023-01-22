@@ -1,0 +1,55 @@
+package middleware
+
+import (
+	"fmt"
+	"log"
+	"net/http"
+	"strings"
+	"template/internal/appctx"
+	h "template/internal/handler"
+	"time"
+
+	"github.com/casbin/casbin/v2"
+	"github.com/sirupsen/logrus"
+)
+
+func Authorization(handler http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		logrus.Info("Authorization middleware is executed")
+		hd := &h.Handler{}
+
+		authHeader := r.Header.Get("Authorization")
+		if strings.Contains(authHeader, "Bearer") {
+			fmt.Println("JWT")
+		} else if strings.Contains(authHeader, "Basic") {
+			logrus.Info("Basic Auth authorization")
+			username, password, ok := r.BasicAuth()
+			if !ok {
+				resp := appctx.NewResponse().WithErrors("Wrong basic auth header").WithCode(http.StatusBadRequest)
+				hd.Response(w, *resp, time.Now())
+			}
+			logrus.Info(username)
+			logrus.Info(password)
+		} else {
+			logrus.Error("Wrong authorizatio header")
+			resp := appctx.NewResponse().WithErrors("Wrong authorization header").WithCode(http.StatusBadRequest)
+			hd.Response(w, *resp, time.Now())
+			return
+		}
+
+		e, err := casbin.NewEnforcer("./internal/config/casbin/auth_model.conf", "./internal/config/casbin/policy.csv")
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		role := "admin"
+
+		if res, _ := e.Enforce(role, r.URL.Path, r.Method); !res {
+			resp := appctx.NewResponse().WithErrors("Unauthorized").WithCode(http.StatusForbidden)
+			hd.Response(w, *resp, time.Now())
+			return
+		}
+
+		handler.ServeHTTP(w, r)
+	})
+}

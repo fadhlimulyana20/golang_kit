@@ -8,7 +8,7 @@ import (
 )
 
 type helloHandler struct {
-	handler      handler
+	handler      Handler
 	helloUsecase hello.HelloUsecase
 }
 
