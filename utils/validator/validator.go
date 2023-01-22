@@ -13,8 +13,10 @@ func Validate(s interface{}) error {
 
 	var errMsg []string
 
-	for _, err := range err.(v.ValidationErrors) {
-		errMsg = append(errMsg, fmt.Sprintf("%s %s", err.Field(), err.Tag()))
+	if err != nil {
+		for _, err := range err.(v.ValidationErrors) {
+			errMsg = append(errMsg, fmt.Sprintf("%s %s", err.Field(), err.Tag()))
+		}
 	}
 
 	if len(errMsg) > 0 {

@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"template/internal/appctx"
 	"template/internal/entities"
+	"template/internal/params"
 	"template/internal/respository"
-	"template/utils/json"
-	"template/utils/validator"
 
+	"github.com/jinzhu/copier"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -17,7 +17,7 @@ type user struct {
 }
 
 type UserUsecase interface {
-	Create(d appctx.Data) appctx.Response
+	Create(param params.UserCreateParam) appctx.Response
 }
 
 func NewUserUsecase() UserUsecase {
@@ -27,19 +27,11 @@ func NewUserUsecase() UserUsecase {
 	}
 }
 
-func (u *user) Create(d appctx.Data) appctx.Response {
+func (u *user) Create(param params.UserCreateParam) appctx.Response {
 	log.Info(fmt.Sprintf("[%s][Create] is executed", u.name))
 
 	var user entities.User
-	if err := json.Decode(d.Request.Body, &user); err != nil {
-		log.Error("Cannot decode json")
-		return *appctx.NewResponse().WithErrors(err.Error())
-	}
-
-	if err := validator.Validate(user); err != nil {
-		log.Error(err.Error())
-		return *appctx.NewResponse().WithErrors(err.Error())
-	}
+	copier.Copy(&user, &param)
 
 	usr, err := u.repo.Create(user)
 	if err != nil {
