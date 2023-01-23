@@ -19,12 +19,14 @@ type MetaData struct {
 
 func NewResponse() *Response {
 	return &Response{
-		Code: http.StatusOK,
+		Code:    http.StatusOK,
+		Message: "Success retrieving data",
 	}
 }
 
 func (r *Response) WithErrors(err string) *Response {
 	r.Code = http.StatusInternalServerError
+	r.Message = "Failed retrieving data"
 	r.Errors = append(r.Errors, err)
 	return r
 }
