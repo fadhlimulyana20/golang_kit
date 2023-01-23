@@ -1,4 +1,4 @@
-name: Deploy
+name: Changelog
 
 on:
   push:
@@ -17,7 +17,7 @@ jobs:
         id: changelog
         uses: requarks/changelog-action@v1
         with:
-          token: ${{ github.token }}
+          token: ${{ secrets.GO_RELEASER_GITHUB_TOKEN }}
           tag: ${{ github.ref_name }}
 
       - name: Create Release
@@ -27,7 +27,7 @@ jobs:
           draft: false
           name: ${{ github.ref_name }}
           body: ${{ steps.changelog.outputs.changes }}
-          token: ${{ github.token }}
+          token: ${{ secrets.GO_RELEASER_GITHUB_TOKEN }}
 
       - name: Commit CHANGELOG.md
         uses: stefanzweifel/git-auto-commit-action@v4
