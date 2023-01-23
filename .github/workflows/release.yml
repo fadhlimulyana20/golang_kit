@@ -28,4 +28,5 @@ jobs:
         goversion: "https://go.dev/dl/go1.19.5.linux-amd64.tar.gz"
         project_path: "./"
         binary_name: "main"
+        release_name: "go-kit"
         extra_files: README.md stubs
