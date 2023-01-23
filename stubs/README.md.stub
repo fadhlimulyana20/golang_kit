@@ -4,6 +4,7 @@
 - Database
 - Authorization (Casbin)
 - Stub
+- Clean Architecture
 
 ## Supported DB
 - Postgres
