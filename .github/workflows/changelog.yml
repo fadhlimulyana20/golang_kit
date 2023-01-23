@@ -17,7 +17,7 @@ jobs:
         id: changelog
         uses: requarks/changelog-action@v1
         with:
-          token: ${{ secrets.GO_RELEASER_GITHUB_TOKEN }}
+          token: ${{ github.token }}
           tag: ${{ github.ref_name }}
 
       - name: Create Release
