@@ -195,7 +195,7 @@ func TemplateStub(templateType string, templateName string, name string) {
 		log.Fatalf("Unable to parse template: %s", name+".go")
 	}
 	template.Execute(f, map[string]string{
-		"Package":              strings.ToTitle(name),
+		"Package":              strings.Title(strings.ToLower(name)),
 		"PackageType":          strings.ToLower(name),
 		"PackageTypeFirstWord": strings.ToLower(string([]rune(name)[0:1])),
 	})
