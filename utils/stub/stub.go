@@ -24,10 +24,11 @@ type file struct {
 var excludedPath = []string{
 	".git",
 	".github",
+	"src",
 }
 
 func MakeStubs() error {
-	err := os.RemoveAll("./stubs")
+	err := os.RemoveAll("./stubs/core")
 	if err != nil {
 		return err
 	}
@@ -65,7 +66,7 @@ func MakeStubs() error {
 	for _, f := range files {
 		destination := strings.Split(f.path, "/")
 		fmt.Println("Debug")
-		stubDestination := fmt.Sprintf("./stubs/%s", strings.Join(destination[0:len(destination)-1], "/"))
+		stubDestination := fmt.Sprintf("./stubs/core/%s", strings.Join(destination[0:len(destination)-1], "/"))
 		fmt.Println(destination)
 
 		input, err := ioutil.ReadFile(f.path)
@@ -80,7 +81,7 @@ func MakeStubs() error {
 			os.MkdirAll(stubDestination, 0755)
 		}
 
-		if err := ioutil.WriteFile(fmt.Sprintf("./stubs/%s.stub", f.path), output, 0755); err != nil {
+		if err := ioutil.WriteFile(fmt.Sprintf("./stubs/core/%s.stub", f.path), output, 0755); err != nil {
 			log.Fatal(err.Error())
 		}
 
@@ -120,7 +121,7 @@ func MakeStubs() error {
 
 func Stubs(module string) {
 	var files []file
-	err := filepath.Walk("./stubs",
+	err := filepath.Walk("./stubs/core",
 		func(path string, info os.FileInfo, err error) error {
 			if err != nil {
 				return err
@@ -147,7 +148,7 @@ func Stubs(module string) {
 		s := StubDetails{
 			Name:        f.path,
 			FileName:    strings.ReplaceAll(f.name, ".stub", ""),
-			Destination: fmt.Sprintf("./src/%s/%s/", module, strings.Join(destination[1:len(destination)-1], "/")),
+			Destination: fmt.Sprintf("./src/%s/%s/", module, strings.Join(destination[2:len(destination)-1], "/")),
 			Values: map[string]string{
 				"Module": module,
 			},
@@ -175,4 +176,28 @@ func Stubs(module string) {
 		template.Execute(f, s.Values)
 
 	}
+}
+
+func TemplateStub(templateType string, templateName string, name string) {
+	contentsBuff, err := os.ReadFile(fmt.Sprintf("./stubs/template/%s/%s.go.stub", templateType, templateName))
+	if err != nil {
+		log.Fatalf("Unable to read file: %s", name+".go")
+	}
+
+	f, err := os.OpenFile("./internal/"+templateType+"/"+name+".go", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0755)
+	if err != nil {
+		log.Fatalf("Unable to open file: %s", name+".go")
+	}
+	defer f.Close()
+
+	template, err := template.New("./internal/" + templateType + "/" + name + ".go").Parse(string(contentsBuff))
+	if err != nil {
+		log.Fatalf("Unable to parse template: %s", name+".go")
+	}
+	template.Execute(f, map[string]string{
+		"Package":              strings.ToTitle(name),
+		"PackageType":          strings.ToLower(name),
+		"PackageTypeFirstWord": strings.ToLower(string([]rune(name)[0:1])),
+	})
+	log.Println(templateType + " created")
 }

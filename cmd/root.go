@@ -77,6 +77,15 @@ func init() {
 				stub.GenerateFromStub(args[0])
 			},
 		},
+		{
+			Use:   "generate [type] [name]",
+			Short: "Make source code from template stub files",
+			Long:  "Make source code from template stub files",
+			Args:  cobra.MinimumNArgs(1),
+			Run: func(cmd *cobra.Command, args []string) {
+				stub.GenerateFromTemplateStub(args[0], "default", args[1])
+			},
+		},
 	}
 	rootCmd.AddCommand(comands...)
 	rootCmd.AddCommand(migration.CreateMigrationCmd)
