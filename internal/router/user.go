@@ -10,6 +10,9 @@ import (
 func (rtr *router) UserRouter() http.Handler {
 	userHandler := handler.NewUserHandler()
 	router := chi.NewRouter()
+
 	router.Post("/", userHandler.Create)
+	router.Get("/", userHandler.List)
+
 	return router
 }

@@ -4,11 +4,13 @@ import (
 	"database/sql"
 	"fmt"
 	"os"
+	"time"
 
 	_ "github.com/lib/pq"
-	log "github.com/sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 func dsn() string {
@@ -31,7 +33,7 @@ func Connection() *sql.DB {
 	dsnConn := dsn()
 	db, err := sql.Open("postgres", dsnConn)
 	if err != nil {
-		log.Fatal("Failed to connect to DB")
+		logrus.Fatal("Failed to connect to DB")
 	}
 
 	// defer db.Close()
@@ -40,10 +42,22 @@ func Connection() *sql.DB {
 }
 
 func ORM() *gorm.DB {
+	newLogger := logger.New(
+		logrus.New(), // io writer
+		logger.Config{
+			SlowThreshold:             time.Second,   // ambang Slow SQL
+			LogLevel:                  logger.Silent, // tingkat Log
+			IgnoreRecordNotFoundError: true,          // mengabaikan kesalahan ErrRecordNotFound  untuk logger
+			Colorful:                  false,         // nonaktifkan warna
+		},
+	)
+
 	dsnConn := dsn()
-	db, err := gorm.Open(postgres.Open(dsnConn), &gorm.Config{})
+	db, err := gorm.Open(postgres.Open(dsnConn), &gorm.Config{
+		Logger: newLogger,
+	})
 	if err != nil {
-		log.Fatal("ORM failed to connect to DB")
+		logrus.Fatal("ORM failed to connect to DB")
 	}
 
 	return db

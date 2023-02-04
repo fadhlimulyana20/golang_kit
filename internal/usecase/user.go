@@ -18,6 +18,7 @@ type user struct {
 
 type UserUsecase interface {
 	Create(param params.UserCreateParam) appctx.Response
+	List(params.UserListParams) appctx.Response
 }
 
 func NewUserUsecase() UserUsecase {
@@ -40,4 +41,17 @@ func (u *user) Create(param params.UserCreateParam) appctx.Response {
 	}
 
 	return *appctx.NewResponse().WithData(usr)
+}
+
+func (u *user) List(param params.UserListParams) appctx.Response {
+	log.Info(fmt.Sprintf("[%s][List] is executed", u.name))
+
+	var usrs []entities.User
+	users, count, err := u.repo.List(usrs, param)
+	if err != nil {
+		log.Error(err.Error())
+		return *appctx.NewResponse().WithErrors(err.Error())
+	}
+
+	return *appctx.NewResponse().WithData(users).WithMeta(int64(param.Page), int64(param.Limit), int64(count))
 }
