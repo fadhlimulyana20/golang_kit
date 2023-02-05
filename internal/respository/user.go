@@ -18,7 +18,9 @@ type userRepo struct {
 
 type UserRepository interface {
 	Create(entities.User) (entities.User, error)
+	Update(entities.User) (entities.User, error)
 	List([]entities.User, params.UserListParams) ([]entities.User, int, error)
+	Get(entities.User, int) (entities.User, error)
 }
 
 func NewUserRepository() UserRepository {
@@ -39,8 +41,21 @@ func (u *userRepo) Create(user entities.User) (entities.User, error) {
 	return user, nil
 }
 
+func (u *userRepo) Get(user entities.User, ID int) (entities.User, error) {
+	log.Info(fmt.Sprintf("[%s][Get] is executed", u.name))
+
+	db := u.db
+
+	if err := db.Debug().First(&user, ID).Error; err != nil {
+		log.Error(fmt.Sprintf("[%s][GET] %s", u.name, err.Error()))
+		return user, err
+	}
+
+	return user, nil
+}
+
 func (u *userRepo) List(users []entities.User, param params.UserListParams) ([]entities.User, int, error) {
-	log.Info(fmt.Sprintf("[%s][List] is executed", u.name))
+	log.Info(fmt.Sprintf("[%s][Update] is executed", u.name))
 
 	var count int64
 	u.db.Find(&users).Count(&count)
@@ -51,10 +66,21 @@ func (u *userRepo) List(users []entities.User, param params.UserListParams) ([]e
 		db.Find(&users).Count(&count)
 	}
 
-	if err := db.Debug().Scopes(gorm_pagination.Paginate(param.Page, param.Limit)).Find(&users).Error; err != nil {
+	if err := db.Debug().Scopes(gorm_pagination.Paginate(param.Page, param.Limit)).Order("created_at desc").Find(&users).Error; err != nil {
 		log.Error(fmt.Sprintf("[%s][List] %s", u.name, err.Error()))
 		return users, int(count), err
 	}
 
 	return users, int(count), nil
+}
+
+func (u *userRepo) Update(user entities.User) (entities.User, error) {
+	log.Info(fmt.Sprintf("[%s][Create] is executed", u.name))
+
+	if err := u.db.Model(&user).Updates(&user).Error; err != nil {
+		log.Error(fmt.Sprintf("[%s][Create] %s", u.name, err.Error()))
+		return user, err
+	}
+
+	return user, nil
 }

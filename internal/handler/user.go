@@ -3,6 +3,7 @@ package handler
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 	"template/internal/appctx"
 	"template/internal/params"
 	"template/internal/usecase"
@@ -10,6 +11,7 @@ import (
 	"template/utils/validator"
 	"time"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/gorilla/schema"
 	"github.com/sirupsen/logrus"
 )
@@ -23,6 +25,8 @@ type user struct {
 type UserHandler interface {
 	Create(w http.ResponseWriter, r *http.Request)
 	List(w http.ResponseWriter, r *http.Request)
+	Update(w http.ResponseWriter, r *http.Request)
+	Get(w http.ResponseWriter, r *http.Request)
 }
 
 func NewUserHandler() UserHandler {
@@ -36,9 +40,6 @@ var decoder = schema.NewDecoder()
 
 func (u *user) Create(w http.ResponseWriter, r *http.Request) {
 	logrus.Info(fmt.Sprintf("[%s][Create] is executed", u.name))
-	// d := appctx.Data{
-	// 	Request: r,
-	// }
 
 	var param params.UserCreateParam
 	ctx := appctx.NewResponse()
@@ -52,8 +53,6 @@ func (u *user) Create(w http.ResponseWriter, r *http.Request) {
 		logrus.Error(err.Error())
 		ctx = ctx.WithErrors(err.Error())
 	}
-
-	fmt.Printf("Debug: %v", param)
 
 	if len(ctx.Errors) > 0 {
 		u.handler.Response(w, *ctx, time.Now())
@@ -91,5 +90,43 @@ func (u *user) List(w http.ResponseWriter, r *http.Request) {
 	}
 
 	resp := u.usecase.List(param)
+	u.handler.Response(w, resp, time.Now())
+}
+
+func (u *user) Update(w http.ResponseWriter, r *http.Request) {
+	logrus.Info(fmt.Sprintf("[%s][Update] is executed", u.name))
+
+	var param params.UserUpdateParam
+	ctx := appctx.NewResponse()
+
+	id := chi.URLParam(r, "id")
+	param.ID, _ = strconv.Atoi(id)
+
+	if err := json.Decode(r.Body, &param); err != nil {
+		logrus.Error("Cannot decode json")
+		ctx = ctx.WithErrors(err.Error())
+	}
+
+	if err := validator.Validate(param); err != nil {
+		logrus.Error(err.Error())
+		ctx = ctx.WithErrors(err.Error())
+	}
+
+	if len(ctx.Errors) > 0 {
+		u.handler.Response(w, *ctx, time.Now())
+		return
+	}
+
+	resp := u.usecase.Update(param)
+	u.handler.Response(w, resp, time.Now())
+}
+
+func (u *user) Get(w http.ResponseWriter, r *http.Request) {
+	logrus.Info(fmt.Sprintf("[%s][Get] is executed", u.name))
+
+	id := chi.URLParam(r, "id")
+	idx, _ := strconv.Atoi(id)
+
+	resp := u.usecase.Get(idx)
 	u.handler.Response(w, resp, time.Now())
 }

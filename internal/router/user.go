@@ -13,6 +13,8 @@ func (rtr *router) UserRouter() http.Handler {
 
 	router.Post("/", userHandler.Create)
 	router.Get("/", userHandler.List)
+	router.Get("/{id}", userHandler.Get)
+	router.Put("/{id}", userHandler.Update)
 
 	return router
 }

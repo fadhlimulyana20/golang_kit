@@ -88,8 +88,7 @@ func init() {
 		},
 	}
 	rootCmd.AddCommand(comands...)
-	rootCmd.AddCommand(migration.CreateMigrationCmd)
-	rootCmd.AddCommand(migration.MigrateCmd)
+	rootCmd.AddCommand(migration.MigrationCmd)
 }
 
 func initConfig() {

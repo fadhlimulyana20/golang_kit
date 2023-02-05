@@ -15,7 +15,7 @@ func Validate(s interface{}) error {
 
 	if err != nil {
 		for _, err := range err.(v.ValidationErrors) {
-			errMsg = append(errMsg, fmt.Sprintf("%s %s", err.Field(), err.Tag()))
+			errMsg = append(errMsg, fmt.Sprintf("%s is %s", err.Field(), err.Tag()))
 		}
 	}
 
