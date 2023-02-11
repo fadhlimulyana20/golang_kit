@@ -3,14 +3,15 @@ package error
 import (
 	"errors"
 	"fmt"
+	"strings"
 )
 
 type ErrorWithContext struct {
 	err error
-	ctx interface{}
+	ctx []string
 }
 
-func NewWithContext(ctx interface{}, msg string) ErrorWithContextInf {
+func NewWithContext(ctx []string, msg string) ErrorWithContextInf {
 	return &ErrorWithContext{
 		err: errors.New(msg),
 		ctx: ctx,
@@ -18,5 +19,5 @@ func NewWithContext(ctx interface{}, msg string) ErrorWithContextInf {
 }
 
 func (e *ErrorWithContext) Error() string {
-	return fmt.Sprintf("%s. Context: %v", e.err.Error(), e.ctx)
+	return fmt.Sprintf("%s. Context: [%s]", e.err.Error(), strings.Join(e.ctx, ","))
 }

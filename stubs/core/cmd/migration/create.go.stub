@@ -21,7 +21,7 @@ func createMigration(name string) {
 }
 
 var CreateMigrationCmd = &cobra.Command{
-	Use:                   "makemigration [ARG]",
+	Use:                   "make [ARG]",
 	Short:                 "Generate migration file",
 	Long:                  "Generate migration file",
 	DisableFlagsInUseLine: true,

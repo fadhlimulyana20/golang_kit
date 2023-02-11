@@ -9,6 +9,10 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"{{.Module}}/utils/modname"
+
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 type StubDetails struct {
@@ -176,4 +180,29 @@ func Stubs(module string) {
 		template.Execute(f, s.Values)
 
 	}
+}
+
+func TemplateStub(templateType string, templateName string, name string) {
+	contentsBuff, err := os.ReadFile(fmt.Sprintf("./stubs/{{.Module}}/%s/%s.go.stub", templateType, templateName))
+	if err != nil {
+		log.Fatalf("Unable to read file: %s", name+".go")
+	}
+
+	f, err := os.OpenFile("./internal/"+templateType+"/"+name+".go", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0755)
+	if err != nil {
+		log.Fatalf("Unable to open file: %s", name+".go")
+	}
+	defer f.Close()
+
+	template, err := template.New("./internal/" + templateType + "/" + name + ".go").Parse(string(contentsBuff))
+	if err != nil {
+		log.Fatalf("Unable to parse template: %s", name+".go")
+	}
+	template.Execute(f, map[string]string{
+		"Module":    modname.GetModuleName(),
+		"Name":      cases.Title(language.English).String(strings.ToLower(name)),
+		"NameLower": strings.ToLower(name),
+		"NameFirst": strings.ToLower(string([]rune(name)[0:1])),
+	})
+	log.Println(templateType + " created")
 }

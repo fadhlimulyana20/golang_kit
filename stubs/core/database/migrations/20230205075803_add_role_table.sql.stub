@@ -1,10 +1,8 @@
 -- +goose Up
 -- +goose StatementBegin
-CREATE TABLE users(
+CREATE TABLE roles(
     id SERIAL PRIMARY KEY,
-    name VARCHAR(255),
-    email VARCHAR(255) UNIQUE,
-    password VARCHAR(255),
+    name VARCHAR(100),
     created_at TIMESTAMP WITHOUT TIME ZONE,
     updated_at TIMESTAMP WITHOUT TIME ZONE
 );
@@ -12,5 +10,5 @@ CREATE TABLE users(
 
 -- +goose Down
 -- +goose StatementBegin
-DROP TABLE users;
+DROP TABLE roles;
 -- +goose StatementEnd

@@ -40,3 +40,13 @@ func (r *Response) WithCode(code int) *Response {
 	r.Code = code
 	return r
 }
+
+func (r *Response) WithMeta(page int64, limit int64, totalCount int64) *Response {
+	r.Meta = &MetaData{
+		Page:       page,
+		Limit:      limit,
+		TotalPage:  (totalCount / limit) + 1,
+		TotalCount: totalCount,
+	}
+	return r
+}

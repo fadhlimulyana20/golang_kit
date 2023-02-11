@@ -183,7 +183,7 @@ func Stubs(module string) {
 }
 
 func TemplateStub(templateType string, templateName string, name string) {
-	contentsBuff, err := os.ReadFile(fmt.Sprintf("./stubs/template/%s/%s.go.stub", templateType, templateName))
+	contentsBuff, err := os.ReadFile(fmt.Sprintf("./stubs/template/%s/%s.go.stuba", templateType, templateName))
 	if err != nil {
 		log.Fatalf("Unable to read file: %s", name+".go")
 	}
