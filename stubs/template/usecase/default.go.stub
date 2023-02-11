@@ -2,40 +2,40 @@ package usecase
 
 import (
 	"fmt"
-	"template/internal/appctx"
-	"template/internal/entities"
-	"template/internal/params"
-	"template/internal/respository"
+	"{{.Module}}/internal/appctx"
+	"{{.Module}}/internal/entities"
+	"{{.Module}}/internal/params"
+	"{{.Module}}/internal/repository"
 
 	"github.com/jinzhu/copier"
 	log "github.com/sirupsen/logrus"
 )
 
-type {{.PackageType}} struct {
-	repo respository.UserRepository
+type {{.NameLower}} struct {
+	repo repository.{{.Name}}Repository
 	name string
 }
 
-type {{.Package}}Usecase interface {
+type {{.Name}}Usecase interface {
 	Create(param params.UserCreateParam) appctx.Response
 }
 
-func New{{.Package}}Usecase() UserUsecase {
+func New{{.Name}}Usecase() {{.Name}}Usecase {
 	return &user{
-		repo: respository.NewUserRepository(),
-		name: "{{.Package}} USECASE",
+		repo: repository.New{{.Name}}Repository(),
+		name: "{{.Name}} Usecase",
 	}
 }
 
-func ({{.PackageTypeFirstWord}} *{{.PackageType}}) Create(param params.UserCreateParam) appctx.Response {
-	log.Info(fmt.Sprintf("[%s][Create] is executed", {{.PackageTypeFirstWord}}.name))
+func ({{.NameFirst}} *{{.NameLower}}) Create(param params.UserCreateParam) appctx.Response {
+	log.Info(fmt.Sprintf("[%s][Create] is executed", {{.NameFirst}}.name))
 
 	var user entities.User
 	copier.Copy(&user, &param)
 
-	usr, err := {{.PackageTypeFirstWord}}.repo.Create(user)
+	usr, err := {{.NameFirst}}.repo.Create(user)
 	if err != nil {
-		log.Error(fmt.Sprintf("[%s][Create] %s", {{.PackageTypeFirstWord}}.name, err.Error()))
+		log.Error(fmt.Sprintf("[%s][Create] %s", {{.NameFirst}}.name, err.Error()))
 		return *appctx.NewResponse().WithErrors(err.Error())
 	}
 

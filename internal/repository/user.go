@@ -1,4 +1,4 @@
-package respository
+package repository
 
 import (
 	"fmt"
@@ -21,6 +21,7 @@ type UserRepository interface {
 	Update(entities.User) (entities.User, error)
 	List([]entities.User, params.UserListParams) ([]entities.User, int, error)
 	Get(entities.User, int) (entities.User, error)
+	Delete(entities.User, int) (entities.User, error)
 }
 
 func NewUserRepository() UserRepository {
@@ -79,6 +80,17 @@ func (u *userRepo) Update(user entities.User) (entities.User, error) {
 
 	if err := u.db.Model(&user).Updates(&user).Error; err != nil {
 		log.Error(fmt.Sprintf("[%s][Create] %s", u.name, err.Error()))
+		return user, err
+	}
+
+	return user, nil
+}
+
+func (u *userRepo) Delete(user entities.User, ID int) (entities.User, error) {
+	log.Info(fmt.Sprintf("[%s][Delete] is executed", u.name))
+
+	if err := u.db.Delete(&user, ID).Error; err != nil {
+		log.Error(fmt.Sprintf("[%s][Delete] %s", u.name, err.Error()))
 		return user, err
 	}
 

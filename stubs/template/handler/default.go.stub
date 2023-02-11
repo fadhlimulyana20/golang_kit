@@ -3,22 +3,22 @@ package handler
 import (
 	"fmt"
 	"net/http"
-	"template/internal/appctx"
-	"template/internal/params"
-	"template/internal/usecase"
-	"template/utils/json"
-	"template/utils/validator"
+	"{{.Module}}/internal/appctx"
+	"{{.Module}}/internal/params"
+	"{{.Module}}/internal/usecase"
+	"{{.Module}}/utils/json"
+	"{{.Module}}/utils/validator"
 	"time"
 
 	"github.com/sirupsen/logrus"
 )
 
-type {{.PackageType}} struct {
+type {{.NameLower}} struct {
 	handler Handler
 	name    string
 }
 
-type {{.Package}}Handler interface {
+type {{.Name}}Handler interface {
 	Create(w http.ResponseWriter, r *http.Request)
     Read(w http.ResponseWriter, r *http.Request)
     Update(w http.ResponseWriter, r *http.Request)
@@ -26,13 +26,13 @@ type {{.Package}}Handler interface {
     Detail(w http.ResponseWriter, r *http.Request)
 }
 
-func New{{.Package}}Handler() {{.Package}}Handler {
-	return &{{.PackageType}} {
-		name:    "{{.Package}} HANDLER",
+func New{{.Name}}Handler() {{.Name}}Handler {
+	return &{{.NameLower}} {
+		name:    "{{.Name}} Handler",
 	}
 }
 
-func ({{.PackageTypeFirstWord}} *{{.PackageType}}) Create(w http.ResponseWriter, r *http.Request) {
+func ({{.NameFirst}} *{{.NameLower}}) Create(w http.ResponseWriter, r *http.Request) {
 	logrus.Info(fmt.Sprintf("[%s][Create] is executed", u.name))
 
 	// var param params.UserCreateParam
@@ -51,15 +51,15 @@ func ({{.PackageTypeFirstWord}} *{{.PackageType}}) Create(w http.ResponseWriter,
 	// fmt.Printf("Debug: %v", param)
 
 	// if len(ctx.Errors) > 0 {
-	// 	{{.PackageTypeFirstWord}}.handler.Response(w, *ctx, time.Now())
+	// 	{{.NameFirst}}.handler.Response(w, *ctx, time.Now())
 	// 	return
 	// }
 
 	// resp := u.usecase.Create(param)
-	// {{.PackageTypeFirstWord}}.handler.Response(w, resp, time.Now())
+	// {{.NameFirst}}.handler.Response(w, resp, time.Now())
 }
 
-func ({{.PackageTypeFirstWord}} *{{.PackageType}}) Read(w http.ResponseWriter, r *http.Request) {
+func ({{.NameFirst}} *{{.NameLower}}) Read(w http.ResponseWriter, r *http.Request) {
 	logrus.Info(fmt.Sprintf("[%s][Create] is executed", u.name))
 
 	// var param params.UserCreateParam
@@ -78,15 +78,15 @@ func ({{.PackageTypeFirstWord}} *{{.PackageType}}) Read(w http.ResponseWriter, r
 	// fmt.Printf("Debug: %v", param)
 
 	// if len(ctx.Errors) > 0 {
-	// 	{{.PackageTypeFirstWord}}.handler.Response(w, *ctx, time.Now())
+	// 	{{.NameFirst}}.handler.Response(w, *ctx, time.Now())
 	// 	return
 	// }
 
 	// resp := u.usecase.Create(param)
-	// {{.PackageTypeFirstWord}}.handler.Response(w, resp, time.Now())
+	// {{.NameFirst}}.handler.Response(w, resp, time.Now())
 }
 
-func ({{.PackageTypeFirstWord}} *{{.PackageType}}) Update(w http.ResponseWriter, r *http.Request) {
+func ({{.NameFirst}} *{{.NameLower}}) Update(w http.ResponseWriter, r *http.Request) {
 	logrus.Info(fmt.Sprintf("[%s][Create] is executed", u.name))
 
 	// var param params.UserCreateParam
@@ -105,15 +105,15 @@ func ({{.PackageTypeFirstWord}} *{{.PackageType}}) Update(w http.ResponseWriter,
 	// fmt.Printf("Debug: %v", param)
 
 	// if len(ctx.Errors) > 0 {
-	// 	{{.PackageTypeFirstWord}}.handler.Response(w, *ctx, time.Now())
+	// 	{{.NameFirst}}.handler.Response(w, *ctx, time.Now())
 	// 	return
 	// }
 
 	// resp := u.usecase.Create(param)
-	// {{.PackageTypeFirstWord}}.handler.Response(w, resp, time.Now())
+	// {{.NameFirst}}.handler.Response(w, resp, time.Now())
 }
 
-func ({{.PackageTypeFirstWord}} *{{.PackageType}}) Delete(w http.ResponseWriter, r *http.Request) {
+func ({{.NameFirst}} *{{.NameLower}}) Delete(w http.ResponseWriter, r *http.Request) {
 	logrus.Info(fmt.Sprintf("[%s][Create] is executed", u.name))
 
 	// var param params.UserCreateParam
@@ -132,15 +132,15 @@ func ({{.PackageTypeFirstWord}} *{{.PackageType}}) Delete(w http.ResponseWriter,
 	// fmt.Printf("Debug: %v", param)
 
 	// if len(ctx.Errors) > 0 {
-	// 	{{.PackageTypeFirstWord}}.handler.Response(w, *ctx, time.Now())
+	// 	{{.NameFirst}}.handler.Response(w, *ctx, time.Now())
 	// 	return
 	// }
 
 	// resp := u.usecase.Create(param)
-	// {{.PackageTypeFirstWord}}.handler.Response(w, resp, time.Now())
+	// {{.NameFirst}}.handler.Response(w, resp, time.Now())
 }
 
-func ({{.PackageTypeFirstWord}} *{{.PackageType}}) Detail(w http.ResponseWriter, r *http.Request) {
+func ({{.NameFirst}} *{{.NameLower}}) Detail(w http.ResponseWriter, r *http.Request) {
 	logrus.Info(fmt.Sprintf("[%s][Create] is executed", u.name))
 
 	// var param params.UserCreateParam
@@ -159,10 +159,10 @@ func ({{.PackageTypeFirstWord}} *{{.PackageType}}) Detail(w http.ResponseWriter,
 	// fmt.Printf("Debug: %v", param)
 
 	// if len(ctx.Errors) > 0 {
-	// 	{{.PackageTypeFirstWord}}.handler.Response(w, *ctx, time.Now())
+	// 	{{.NameFirst}}.handler.Response(w, *ctx, time.Now())
 	// 	return
 	// }
 
 	// resp := u.usecase.Create(param)
-	// {{.PackageTypeFirstWord}}.handler.Response(w, resp, time.Now())
+	// {{.NameFirst}}.handler.Response(w, resp, time.Now())
 }

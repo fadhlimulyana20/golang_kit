@@ -5,7 +5,7 @@ import (
 	"template/internal/appctx"
 	"template/internal/entities"
 	"template/internal/params"
-	"template/internal/respository"
+	"template/internal/repository"
 	"template/utils/password"
 
 	"github.com/jinzhu/copier"
@@ -13,7 +13,7 @@ import (
 )
 
 type user struct {
-	repo respository.UserRepository
+	repo repository.UserRepository
 	name string
 }
 
@@ -33,7 +33,7 @@ type UserUsecase interface {
 
 func NewUserUsecase() UserUsecase {
 	return &user{
-		repo: respository.NewUserRepository(),
+		repo: repository.NewUserRepository(),
 		name: "USER USECASE",
 	}
 }

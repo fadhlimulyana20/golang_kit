@@ -89,6 +89,7 @@ func init() {
 	}
 	rootCmd.AddCommand(comands...)
 	rootCmd.AddCommand(migration.MigrationCmd)
+	rootCmd.AddCommand(stub.TemplateCmd)
 }
 
 func initConfig() {

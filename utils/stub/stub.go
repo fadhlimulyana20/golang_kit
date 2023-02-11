@@ -9,6 +9,10 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"template/utils/modname"
+
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 type StubDetails struct {
@@ -195,9 +199,10 @@ func TemplateStub(templateType string, templateName string, name string) {
 		log.Fatalf("Unable to parse template: %s", name+".go")
 	}
 	template.Execute(f, map[string]string{
-		"Package":              strings.Title(strings.ToLower(name)),
-		"PackageType":          strings.ToLower(name),
-		"PackageTypeFirstWord": strings.ToLower(string([]rune(name)[0:1])),
+		"Module":    modname.GetModuleName(),
+		"Name":      cases.Title(language.English).String(strings.ToLower(name)),
+		"NameLower": strings.ToLower(name),
+		"NameFirst": strings.ToLower(string([]rune(name)[0:1])),
 	})
 	log.Println(templateType + " created")
 }
