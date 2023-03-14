@@ -1,13 +1,22 @@
 package appctx
 
-import "net/http"
+import (
+	"errors"
+	"net/http"
+	"time"
+
+	apperror "template/utils/error"
+
+	"gorm.io/gorm"
+)
 
 type Response struct {
-	Code    int         `json:"code"`
-	Message interface{} `json:"message,omitempty"`
-	Errors  []string    `json:"errors,omitempty"`
-	Data    interface{} `json:"data,omitempty"`
-	Meta    interface{} `json:"meta,omitempty"`
+	Code        int           `json:"code"`
+	Message     interface{}   `json:"message,omitempty"`
+	Errors      []interface{} `json:"errors,omitempty"`
+	Data        interface{}   `json:"data,omitempty"`
+	Meta        interface{}   `json:"meta,omitempty"`
+	ProcessTime int64         `json:"process_time"`
 }
 
 type MetaData struct {
@@ -24,10 +33,33 @@ func NewResponse() *Response {
 	}
 }
 
+func (r *Response) WithErrorContexts(err error) *Response {
+	r.Code = http.StatusInternalServerError
+	r.Message = "Failed retrieving data"
+
+	errCtx := err.(*apperror.ErrorWithContext)
+	r.Errors = append(r.Errors, errCtx.Ctx)
+	return r
+}
+
 func (r *Response) WithErrors(err string) *Response {
 	r.Code = http.StatusInternalServerError
 	r.Message = "Failed retrieving data"
 	r.Errors = append(r.Errors, err)
+	return r
+}
+
+func (r *Response) WithErrorObj(err error) *Response {
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		r.Code = http.StatusNotFound
+		r.Message = "Failed retrieving data"
+		r.Errors = append(r.Errors, err.Error())
+	} else {
+		r.Code = http.StatusInternalServerError
+		r.Message = "Failed retrieving data"
+		r.Errors = append(r.Errors, err.Error())
+	}
+
 	return r
 }
 
@@ -41,6 +73,11 @@ func (r *Response) WithCode(code int) *Response {
 	return r
 }
 
+func (r *Response) WithMessage(message string) *Response {
+	r.Message = message
+	return r
+}
+
 func (r *Response) WithMeta(page int64, limit int64, totalCount int64) *Response {
 	r.Meta = &MetaData{
 		Page:       page,
@@ -48,5 +85,11 @@ func (r *Response) WithMeta(page int64, limit int64, totalCount int64) *Response
 		TotalPage:  (totalCount / limit) + 1,
 		TotalCount: totalCount,
 	}
+	return r
+}
+
+func (r *Response) WithProcessTime(timeStart time.Time, timeEnd time.Time) *Response {
+	timeDuration := timeEnd.Sub(timeStart)
+	r.ProcessTime = timeDuration.Milliseconds()
 	return r
 }
