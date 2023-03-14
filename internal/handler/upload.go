@@ -1,0 +1,55 @@
+package handler
+
+import (
+	"net/http"
+	"os"
+	"template/internal/appctx"
+	"template/utils/minio"
+	"time"
+)
+
+type uploadHandler struct {
+	handler Handler
+	// helloUsecase hello.HelloUsecase
+}
+
+func NewUploadHandler() *uploadHandler {
+	return &uploadHandler{
+		// helloUsecase: hello.NewHelloUsecase(),
+	}
+}
+
+func (h *uploadHandler) Upload(w http.ResponseWriter, r *http.Request) {
+	if err := r.ParseMultipartForm(1024); err != nil {
+		d := appctx.NewResponse().WithErrors(err.Error())
+		h.handler.Response(w, *d, time.Now())
+		return
+	}
+
+	endpoint := os.Getenv("MINIO_ENDPOINT")
+	access := os.Getenv("MINIO_ACCESS_KEY_ID")
+	secret := os.Getenv("MINIO_SECRET_ACCESS_KEY")
+	bucket := os.Getenv("MINIO_BUCKET")
+	path := make(chan string)
+	e := make(chan error)
+
+	_, fileHeader, err := r.FormFile("file")
+	if err != nil {
+		d := appctx.NewResponse().WithErrors(err.Error())
+		h.handler.Response(w, *d, time.Now())
+		return
+	}
+
+	m := minio.NewMinioStorage(endpoint, access, secret, bucket, false)
+	go m.UploadMultipart(path, e, fileHeader, "/test")
+
+	if err := <-e; err != nil {
+		d := appctx.NewResponse().WithErrors(err.Error())
+		h.handler.Response(w, *d, time.Now())
+		return
+	}
+
+	d := appctx.NewResponse()
+	d.Message = <-path
+	h.handler.Response(w, *d, time.Now())
+}
