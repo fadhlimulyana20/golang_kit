@@ -18,6 +18,8 @@ func createClient() MinioStorageContract {
 	return m
 }
 
+var filename = "text_test.txt"
+
 func TestClient(t *testing.T) {
 	m := createClient()
 	client, err := m.Client()
@@ -37,18 +39,18 @@ func TestUpload(t *testing.T) {
 
 	bucket := "golang-template"
 
-	info, err := client.FPutObject(context.Background(), bucket, "text_test.txt", "./text_test.txt", minio.PutObjectOptions{ContentType: "application/txt"})
+	info, err := client.FPutObject(context.Background(), bucket, filename, "./text_test.txt", minio.PutObjectOptions{ContentType: "application/txt"})
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	t.Logf("Successfully uploaded %s of size %d\n", "text_test.txt", info.Size)
+	t.Logf("Successfully uploaded %s of size %d\n", filename, info.Size)
 }
 
 func TestGetPresignedURL(t *testing.T) {
 	m := createClient()
 
-	url, err := m.GetTemporaryPublicUrl("/test/file_1678777375.jpg")
+	url, err := m.GetTemporaryPublicUrl(filename)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -56,51 +58,12 @@ func TestGetPresignedURL(t *testing.T) {
 	t.Log(url)
 }
 
-// func createImage() *os.File {
-// 	width := 200
-// 	height := 100
+func TestDeleteFile(t *testing.T) {
+	m := createClient()
 
-// 	upLeft := image.Point{0, 0}
-// 	lowRight := image.Point{width, height}
+	if err := m.DeleteFile(filename); err != nil {
+		t.Fatal(err)
+	}
 
-// 	img := image.NewRGBA(image.Rectangle{upLeft, lowRight})
-
-// 	// Colors are defined by Red, Green, Blue, Alpha uint8 values.
-// 	cyan := color.RGBA{100, 200, 200, 0xff}
-
-// 	// Set color for each pixel.
-// 	for x := 0; x < width; x++ {
-// 		for y := 0; y < height; y++ {
-// 			switch {
-// 			case x < width/2 && y < height/2: // upper left quadrant
-// 				img.Set(x, y, cyan)
-// 			case x >= width/2 && y >= height/2: // lower right quadrant
-// 				img.Set(x, y, color.White)
-// 			default:
-// 				// Use zero value.
-// 			}
-// 		}
-// 	}
-
-// 	// Encode as PNG.
-// 	f, _ := os.Create("./image.png")
-// 	png.Encode(f, img)
-// 	return f
-// }
-
-// func TestUploadMultipart(t *testing.T) {
-// 	body := new(bytes.Buffer)
-// 	writer := multipart.NewWriter(body)
-// 	img := createImage()
-// 	defer os.Remove(img.Name())
-
-// 	part, err := writer.CreateFormFile("file", img.Name())
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
-
-// 	if _, err := io.Copy(part, img); err != nil {
-// 		log.Fatal(err)
-// 	}
-
-// }
+	t.Log("File deleted")
+}

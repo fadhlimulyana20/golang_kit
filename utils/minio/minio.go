@@ -28,7 +28,10 @@ type MinioStorageContract interface {
 	Client() (*minio.Client, error)
 	// Upload multipart file using go routine
 	UploadMultipart(fileUploadedPath chan string, e chan error, fileHeader *multipart.FileHeader, pathFile string)
+	// Generate temporary public URL. It will expire within 24 hours.
 	GetTemporaryPublicUrl(filePath string) (*url.URL, error)
+	// Delete file from bucket
+	DeleteFile(filepath string) error
 }
 
 func NewMinioStorage(endpoint, accessKeyID, secretAccessKey, bucket string, useSSL bool) MinioStorageContract {
@@ -118,4 +121,14 @@ func (m *minioStorage) GetTemporaryPublicUrl(filePath string) (*url.URL, error) 
 	}
 
 	return presignedURL, nil
+}
+
+func (m *minioStorage) DeleteFile(filepath string) error {
+	client, err := m.Client()
+	if err != nil {
+		return err
+	}
+
+	err = client.RemoveObject(context.Background(), m.BucketName, filepath, minio.RemoveObjectOptions{})
+	return err
 }
