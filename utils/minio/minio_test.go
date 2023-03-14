@@ -7,20 +7,20 @@ import (
 	"github.com/minio/minio-go/v7"
 )
 
-func createClient() (*minio.Client, error) {
+func createClient() MinioStorageContract {
 	endpoint := "localhost:9000"
 	accessKey := "admin"
 	accessSecret := "password"
 	useSSL := false
 	bucket := "golang-template"
 
-	minio := NewMinioStorage(endpoint, accessKey, accessSecret, bucket, useSSL)
-	client, err := minio.Client()
-	return client, err
+	m := NewMinioStorage(endpoint, accessKey, accessSecret, bucket, useSSL)
+	return m
 }
 
 func TestClient(t *testing.T) {
-	client, err := createClient()
+	m := createClient()
+	client, err := m.Client()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -29,7 +29,8 @@ func TestClient(t *testing.T) {
 }
 
 func TestUpload(t *testing.T) {
-	client, err := createClient()
+	m := createClient()
+	client, err := m.Client()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -42,6 +43,17 @@ func TestUpload(t *testing.T) {
 	}
 
 	t.Logf("Successfully uploaded %s of size %d\n", "text_test.txt", info.Size)
+}
+
+func TestGetPresignedURL(t *testing.T) {
+	m := createClient()
+
+	url, err := m.GetTemporaryPublicUrl("/test/file_1678777375.jpg")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	t.Log(url)
 }
 
 // func createImage() *os.File {

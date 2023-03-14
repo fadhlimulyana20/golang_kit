@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"io"
 	"mime/multipart"
+	"net/url"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/minio/minio-go/v7"
@@ -26,6 +28,7 @@ type MinioStorageContract interface {
 	Client() (*minio.Client, error)
 	// Upload multipart file using go routine
 	UploadMultipart(fileUploadedPath chan string, e chan error, fileHeader *multipart.FileHeader, pathFile string)
+	GetTemporaryPublicUrl(filePath string) (*url.URL, error)
 }
 
 func NewMinioStorage(endpoint, accessKeyID, secretAccessKey, bucket string, useSSL bool) MinioStorageContract {
@@ -97,4 +100,22 @@ func (m *minioStorage) UploadMultipart(fileUploadedPath chan string, e chan erro
 	}
 	e <- nil
 	fileUploadedPath <- destPath
+}
+
+func (m *minioStorage) GetTemporaryPublicUrl(filePath string) (*url.URL, error) {
+	filePathElem := strings.Split(filePath, "/")
+	filename := filePathElem[len(filePathElem)-1]
+	reqParams := make(url.Values)
+	reqParams.Set("response-content-disposition", fmt.Sprintf("attachment; filename=\"%s\"", filename))
+	client, err := m.Client()
+	if err != nil {
+		return nil, nil
+	}
+
+	presignedURL, err := client.PresignedGetObject(context.Background(), m.BucketName, filePath, time.Second*24*60*60, reqParams)
+	if err != nil {
+		return nil, nil
+	}
+
+	return presignedURL, nil
 }
