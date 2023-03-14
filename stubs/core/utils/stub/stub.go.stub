@@ -3,13 +3,12 @@ package stub
 import (
 	"bytes"
 	"fmt"
-	"html/template"
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
 	"strings"
 	"{{.Module}}/utils/modname"
+	"text/template"
 
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
@@ -73,7 +72,7 @@ func MakeStubs() error {
 		stubDestination := fmt.Sprintf("./stubs/core/%s", strings.Join(destination[0:len(destination)-1], "/"))
 		fmt.Println(destination)
 
-		input, err := ioutil.ReadFile(f.path)
+		input, err := os.ReadFile(f.path)
 		if err != nil {
 			log.Fatal(err.Error())
 		}
@@ -85,7 +84,7 @@ func MakeStubs() error {
 			os.MkdirAll(stubDestination, 0755)
 		}
 
-		if err := ioutil.WriteFile(fmt.Sprintf("./stubs/core/%s.stub", f.path), output, 0755); err != nil {
+		if err := os.WriteFile(fmt.Sprintf("./stubs/core/%s.stub", f.path), output, 0755); err != nil {
 			log.Fatal(err.Error())
 		}
 
