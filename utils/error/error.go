@@ -7,17 +7,22 @@ import (
 )
 
 type ErrorWithContext struct {
-	err error
-	ctx []string
+	Err error
+	Ctx map[string]interface{}
 }
 
-func NewWithContext(ctx []string, msg string) ErrorWithContextInf {
+func NewWithContext(ctx map[string]interface{}, msg string) ErrorWithContextInf {
 	return &ErrorWithContext{
-		err: errors.New(msg),
-		ctx: ctx,
+		Err: errors.New(msg),
+		Ctx: ctx,
 	}
 }
 
 func (e *ErrorWithContext) Error() string {
-	return fmt.Sprintf("%s. Context: [%s]", e.err.Error(), strings.Join(e.ctx, ","))
+	var ctx []string
+	for k, v := range e.Ctx {
+		s := fmt.Sprintf("key: %s, msg: %s", k, v)
+		ctx = append(ctx, s)
+	}
+	return fmt.Sprintf("%s. Context: [%s]", e.Err.Error(), strings.Join(ctx, ","))
 }

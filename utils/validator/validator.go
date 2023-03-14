@@ -2,25 +2,72 @@ package validator
 
 import (
 	"fmt"
-	apperror "template/utils/error"
 
+	apperror "template/utils/error"
+	"template/utils/text"
+
+	"github.com/go-playground/locales/en"
+	ut "github.com/go-playground/universal-translator"
 	v "github.com/go-playground/validator/v10"
 )
 
+var (
+	validate = v.New()
+	eng      = en.New()
+	uni      = ut.New(eng, eng)
+)
+
+type FieldLevel v.FieldLevel
+
+func GetValidator() *v.Validate {
+	return validate
+}
+
+func RegisterValidation(tag string, fn func(fl v.FieldLevel) bool) {
+	validate.RegisterValidation(tag, fn)
+}
+
+func AddTranslation(tag string, errMessage string) {
+	registerFn := func(ut ut.Translator) error {
+		return ut.Add(tag, errMessage, false)
+	}
+
+	transFn := func(ut ut.Translator, fe v.FieldError) string {
+		param := fe.Param()
+		tag := fe.Tag()
+
+		t, err := ut.T(tag, fe.Field(), param)
+		if err != nil {
+			return fe.(error).Error()
+		}
+		return t
+	}
+
+	trans, _ := uni.GetTranslator("en")
+
+	_ = validate.RegisterTranslation(tag, trans, registerFn, transFn)
+}
+
 func Validate(s interface{}) error {
-	validate := v.New()
 	err := validate.Struct(s)
 
-	var errMsg []string
+	validationError := make(map[string]interface{})
+	errCount := 0
 
 	if err != nil {
 		for _, err := range err.(v.ValidationErrors) {
-			errMsg = append(errMsg, fmt.Sprintf("%s is %s", err.Field(), err.Tag()))
+			field := text.ToSnakeCase(err.Field())
+			if err.Tag() == "required" {
+				validationError[field] = fmt.Sprintf("%s is required", field)
+			} else {
+				validationError[field] = fmt.Sprintf("%s with value '%v' does not satisfy tag %s", field, err.Value(), err.Tag())
+			}
+			errCount++
 		}
 	}
 
-	if len(errMsg) > 0 {
-		return apperror.NewWithContext(errMsg, "validation error")
+	if errCount > 0 {
+		return apperror.NewWithContext(validationError, "validation error")
 	}
 
 	return err
