@@ -3,15 +3,24 @@ package router
 import (
 	"net/http"
 	m "template/internal/middleware"
+	mail "template/utils/mailer"
 
 	"github.com/go-chi/chi/v5"
+	"gorm.io/gorm"
 )
 
 type router struct {
 	router *chi.Mux
 }
 
-func NewRouter() Router {
+type RouterCfg struct {
+	DB        *gorm.DB
+	SMTP      mail.Mailer
+	Secret    string
+	AesSecret string
+}
+
+func NewRouter(r *RouterCfg) Router {
 	return &router{
 		router: chi.NewRouter(),
 	}

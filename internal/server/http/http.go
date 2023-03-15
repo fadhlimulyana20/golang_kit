@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"template/internal/router"
 
 	"time"
 
@@ -13,12 +12,6 @@ import (
 
 type httpServer struct {
 	router http.Handler
-}
-
-func NewServer() Server {
-	return &httpServer{
-		router: router.NewRouter().Route(),
-	}
 }
 
 func (h *httpServer) Run(ctx context.Context) {
