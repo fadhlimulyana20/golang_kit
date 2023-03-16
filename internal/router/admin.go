@@ -1,0 +1,46 @@
+package router
+
+import (
+	"net/http"
+
+	"template/internal/handler"
+
+	"github.com/go-chi/chi/v5"
+)
+
+// Router with auth with RBAC admin
+func (rtr *router) AdminRouterV1() http.Handler {
+	router := chi.NewRouter()
+
+	router.Mount("/user", rtr.userAdminRouterV1())
+	router.Mount("/role", rtr.roleAdminRouterV1())
+
+	return router
+}
+
+func (rtr *router) userAdminRouterV1() http.Handler {
+	userHandler := handler.NewUserHandler(rtr.cfg.DB)
+	router := chi.NewRouter()
+
+	router.Post("/", userHandler.Create)
+	router.Get("/", userHandler.List)
+	router.Get("/{id}", userHandler.Get)
+	router.Put("/{id}", userHandler.Update)
+
+	return router
+}
+
+func (rtr *router) roleAdminRouterV1() http.Handler {
+	roleHandler := handler.NewRoleHandler(rtr.cfg.DB)
+	router := chi.NewRouter()
+
+	router.Post("/", roleHandler.Create)
+	router.Get("/", roleHandler.Read)
+	router.Get("/{id}", roleHandler.Detail)
+	router.Put("/{id}", roleHandler.Update)
+	router.Delete("/{id}", roleHandler.Delete)
+	router.Post("/assign", roleHandler.AssignRole)
+	router.Post("/revoke", roleHandler.RevokeRole)
+
+	return router
+}

@@ -19,9 +19,10 @@ func NewHelloHandler() *helloHandler {
 }
 
 func (h *helloHandler) Hello(w http.ResponseWriter, r *http.Request) {
+	startTime := time.Now()
 	d := appctx.Data{
 		Request: r,
 	}
 	resp := h.helloUsecase.Hello(d)
-	h.handler.Response(w, resp, time.Now())
+	h.handler.Response(w, resp, startTime, time.Now())
 }

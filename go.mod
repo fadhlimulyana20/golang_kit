@@ -5,9 +5,11 @@ go 1.19
 require (
 	github.com/casbin/casbin/v2 v2.60.0
 	github.com/go-chi/chi/v5 v5.0.8
+	github.com/go-chi/cors v1.2.1
 	github.com/go-playground/locales v0.14.0
 	github.com/go-playground/universal-translator v0.18.0
 	github.com/go-playground/validator/v10 v10.11.1
+	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/gorilla/schema v1.2.0
 	github.com/jinzhu/copier v0.3.5
 	github.com/joho/godotenv v1.4.0
@@ -21,6 +23,7 @@ require (
 	golang.org/x/mod v0.7.0
 	golang.org/x/text v0.7.0
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
+	gorm.io/driver/mysql v1.4.7
 	gorm.io/driver/postgres v1.4.6
 	gorm.io/gorm v1.24.3
 )
@@ -30,7 +33,6 @@ require (
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
 	github.com/go-sql-driver/mysql v1.7.0 // indirect
-	github.com/golang-jwt/jwt/v4 v4.5.0 // indirect
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
@@ -63,5 +65,4 @@ require (
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	gorm.io/driver/mysql v1.4.7 // indirect
 )

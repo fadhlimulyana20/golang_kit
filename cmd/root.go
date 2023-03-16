@@ -53,14 +53,6 @@ func init() {
 
 	comands := []*cobra.Command{
 		{
-			Use:   "serve",
-			Short: "Start HTTP server",
-			Long:  "Start HTTP Server",
-			Run: func(cmd *cobra.Command, args []string) {
-				http.StartServer(ctx)
-			},
-		},
-		{
 			Use:   "stubilize",
 			Short: "Make stubs file from source code",
 			Long:  "Make stubs file from source code",
@@ -88,6 +80,7 @@ func init() {
 		},
 	}
 	rootCmd.AddCommand(comands...)
+	rootCmd.AddCommand(http.ServerCmd(ctx))
 	rootCmd.AddCommand(migration.MigrationCmd)
 	rootCmd.AddCommand(stub.TemplateCmd)
 }

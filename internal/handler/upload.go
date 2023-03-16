@@ -20,9 +20,10 @@ func NewUploadHandler() *uploadHandler {
 }
 
 func (h *uploadHandler) Upload(w http.ResponseWriter, r *http.Request) {
+	startTime := time.Now()
 	if err := r.ParseMultipartForm(1024); err != nil {
 		d := appctx.NewResponse().WithErrors(err.Error())
-		h.handler.Response(w, *d, time.Now())
+		h.handler.Response(w, *d, startTime, time.Now())
 		return
 	}
 
@@ -36,7 +37,7 @@ func (h *uploadHandler) Upload(w http.ResponseWriter, r *http.Request) {
 	_, fileHeader, err := r.FormFile("file")
 	if err != nil {
 		d := appctx.NewResponse().WithErrors(err.Error())
-		h.handler.Response(w, *d, time.Now())
+		h.handler.Response(w, *d, startTime, time.Now())
 		return
 	}
 
@@ -45,11 +46,11 @@ func (h *uploadHandler) Upload(w http.ResponseWriter, r *http.Request) {
 
 	if err := <-e; err != nil {
 		d := appctx.NewResponse().WithErrors(err.Error())
-		h.handler.Response(w, *d, time.Now())
+		h.handler.Response(w, *d, startTime, time.Now())
 		return
 	}
 
 	d := appctx.NewResponse()
 	d.Message = <-path
-	h.handler.Response(w, *d, time.Now())
+	h.handler.Response(w, *d, startTime, time.Now())
 }

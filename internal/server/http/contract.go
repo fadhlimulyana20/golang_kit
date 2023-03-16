@@ -9,7 +9,7 @@ import (
 )
 
 type Server interface {
-	Run(ctx context.Context)
+	Run(ctx context.Context, port int)
 	Done()
 }
 

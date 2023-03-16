@@ -2,11 +2,14 @@ package usecase
 
 import (
 	"fmt"
+
 	"template/internal/appctx"
 	"template/internal/entities"
 	"template/internal/params"
 	"template/internal/repository"
 	"template/utils/password"
+
+	"gorm.io/gorm"
 
 	"github.com/jinzhu/copier"
 	log "github.com/sirupsen/logrus"
@@ -29,11 +32,14 @@ type UserUsecase interface {
 
 	// Update user record
 	Get(int) appctx.Response
+
+	// Delete user record
+	Delete(int) appctx.Response
 }
 
-func NewUserUsecase() UserUsecase {
+func NewUserUsecase(db *gorm.DB) UserUsecase {
 	return &user{
-		repo: repository.NewUserRepository(),
+		repo: repository.NewUserRepository(db),
 		name: "USER USECASE",
 	}
 }
@@ -92,7 +98,20 @@ func (u *user) Update(param params.UserUpdateParam) appctx.Response {
 }
 
 func (u *user) Get(ID int) appctx.Response {
-	log.Info(fmt.Sprintf("[%s][Update] is executed", u.name))
+	log.Info(fmt.Sprintf("[%s][Get] is executed", u.name))
+
+	var user entities.User
+	user, err := u.repo.Get(user, ID)
+	if err != nil {
+		log.Error(fmt.Sprintf("[%s][Get] %s", u.name, err.Error()))
+		return *appctx.NewResponse().WithErrors(err.Error())
+	}
+
+	return *appctx.NewResponse().WithData(user)
+}
+
+func (u *user) Delete(ID int) appctx.Response {
+	log.Info(fmt.Sprintf("[%s][Delete] is executed", u.name))
 
 	var user entities.User
 	user, err := u.repo.Get(user, ID)

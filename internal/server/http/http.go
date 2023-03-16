@@ -14,13 +14,12 @@ type httpServer struct {
 	router http.Handler
 }
 
-func (h *httpServer) Run(ctx context.Context) {
-	log.Info("Server started")
+func (h *httpServer) Run(ctx context.Context, port int) {
+	log.Info(fmt.Sprintf("Server running on port %d. Access it from http://127.0.0.1:%d\n", port, port))
 	server := http.Server{
-		Addr:    fmt.Sprintf("0.0.0.0:%d", 3000),
+		Addr:    fmt.Sprintf("0.0.0.0:%d", port),
 		Handler: h.router,
 	}
-
 	go func() {
 		if err := server.ListenAndServe(); err != nil {
 			log.Warn("http server got %w", err.Error())
