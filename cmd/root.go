@@ -82,6 +82,7 @@ func init() {
 	rootCmd.AddCommand(comands...)
 	rootCmd.AddCommand(http.ServerCmd(ctx))
 	rootCmd.AddCommand(migration.MigrationCmd)
+	rootCmd.AddCommand(migration.SeederCmd)
 	rootCmd.AddCommand(stub.TemplateCmd)
 }
 

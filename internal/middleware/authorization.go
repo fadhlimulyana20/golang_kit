@@ -34,6 +34,7 @@ func Authorization(db *gorm.DB) func(handler http.Handler) http.Handler {
 			}
 
 			var user entities.User
+			var roles []entities.Role
 			userRepo := repository.NewUserRepository(db)
 
 			if res, _ := e_route.Enforce(r.URL.Path, r.Method); res {
@@ -57,6 +58,7 @@ func Authorization(db *gorm.DB) func(handler http.Handler) http.Handler {
 						hd.Response(w, *resp, startTime, time.Now())
 						return
 					}
+					roles = user.Roles
 
 					r.Header.Add("user", strconv.Itoa(user.ID))
 				} else if strings.Contains(authHeader, "Basic") {
@@ -75,6 +77,7 @@ func Authorization(db *gorm.DB) func(handler http.Handler) http.Handler {
 						hd.Response(w, *resp, startTime, time.Now())
 						return
 					}
+					roles = user.Roles
 
 					if match := p.CheckPasswordHash(password, user.Password); !match {
 						resp := appctx.NewResponse().WithErrors("wrong password").WithCode(http.StatusUnauthorized)
@@ -90,19 +93,26 @@ func Authorization(db *gorm.DB) func(handler http.Handler) http.Handler {
 					hd.Response(w, *resp, startTime, time.Now())
 					return
 				}
-			}
 
-			e, err := casbin.NewEnforcer("./internal/config/casbin/auth_model.conf", "./internal/config/casbin/policy.csv")
-			if err != nil {
-				log.Fatal(err)
-			}
+				e, err := casbin.NewEnforcer("./internal/config/casbin/auth_model.conf", "./internal/config/casbin/policy.csv")
+				if err != nil {
+					log.Fatal(err)
+				}
 
-			role := "admin"
+				isAuthorized := false
 
-			if res, _ := e.Enforce(role, r.URL.Path, r.Method); !res {
-				resp := appctx.NewResponse().WithErrors("Unauthorized").WithCode(http.StatusForbidden)
-				hd.Response(w, *resp, startTime, time.Now())
-				return
+				for _, role := range roles {
+					if res, _ := e.Enforce(role.Name, r.URL.Path, r.Method); res {
+						isAuthorized = true
+						break
+					}
+				}
+
+				if !isAuthorized {
+					resp := appctx.NewResponse().WithErrors("Unauthorized role").WithCode(http.StatusForbidden)
+					hd.Response(w, *resp, startTime, time.Now())
+					return
+				}
 			}
 
 			handler.ServeHTTP(w, r)
