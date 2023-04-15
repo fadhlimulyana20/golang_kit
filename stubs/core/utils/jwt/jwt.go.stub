@@ -1,0 +1,97 @@
+package jwt
+
+import (
+	"errors"
+	"fmt"
+	"os"
+	"time"
+
+	_ "{{.Module}}/utils/env"
+
+	"github.com/golang-jwt/jwt/v4"
+)
+
+type JWTClaims struct {
+	UserID int
+	Type   string
+	jwt.RegisteredClaims
+}
+
+var key = os.Getenv("SECRET")
+var issuer = os.Getenv("APP_NAME")
+
+func GenerateToken(tokenType string, userID int) (string, error) {
+	mySigningKey := []byte("AllYourBase")
+	if key != "" {
+		mySigningKey = []byte(key)
+
+	}
+
+	durationHour := 2
+	if tokenType == "refresh" {
+		durationHour = 30
+	}
+
+	claims := JWTClaims{
+		userID,
+		tokenType,
+		jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * time.Duration(durationHour))),
+			Issuer:    issuer,
+		},
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	ss, err := token.SignedString(mySigningKey)
+	return ss, err
+}
+
+func ParseToken(tokenString string) (*JWTClaims, error) {
+	mySigningKey := []byte("AllYourBase")
+	if key != "" {
+		mySigningKey = []byte(key)
+
+	}
+
+	token, err := jwt.ParseWithClaims(tokenString, &JWTClaims{}, func(token *jwt.Token) (interface{}, error) {
+		return mySigningKey, nil
+	})
+
+	claims, ok := token.Claims.(*JWTClaims)
+	if ok && token.Valid {
+		fmt.Printf("%v", claims)
+	} else {
+		fmt.Println(err)
+		return claims, err
+	}
+
+	return claims, nil
+}
+
+func RefreshToken(token string) (string, error) {
+	claims, err := ParseToken(token)
+	if err != nil {
+		return "", err
+	}
+
+	if claims.Type != "refresh" {
+		return "", errors.New("refresh token is invalid")
+	}
+
+	ss, err := GenerateToken("access", claims.UserID)
+	if err != nil {
+		return "", err
+	}
+
+	return ss, nil
+}
+
+func main() {
+	ss, err := GenerateToken("refresh", 1)
+	fmt.Printf("err: %v\n", err)
+	// tokenString := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmb28iOiJiYXIiLCJpc3MiOiJ0ZXN0IiwiYXVkIjoic2luZ2xlIn0.QAWg1vGvnqRuCFTMcPkjZljXHh8U3L_qUjszOtQbeaA"
+	ParseToken(ss)
+
+	ssr, _ := RefreshToken(ss)
+	fmt.Println(ssr)
+}
