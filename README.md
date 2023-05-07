@@ -11,10 +11,12 @@ The project documentation can be found in this [link](https://fadhlimulyana.noti
 - HTTP Server
 - Database
 - Migration
+- Seeder
 - Authorization (Casbin)
 - JWT
 - AES Encryption
 - Mailer
+- Minio (S3)
 - Stub
 - Clean Architecture
 
