@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"template/internal/appctx"
+	"template/internal/config"
 	m "template/internal/middleware"
 	mail "template/utils/mailer"
 
@@ -14,7 +15,7 @@ import (
 
 type router struct {
 	router *chi.Mux
-	cfg    *RouterCfg
+	cfg    *config.Config
 }
 
 type RouterCfg struct {
@@ -24,10 +25,10 @@ type RouterCfg struct {
 	AesSecret string
 }
 
-func NewRouter(r *RouterCfg) Router {
+func NewRouter(cfg *config.Config) Router {
 	return &router{
 		router: chi.NewRouter(),
-		cfg:    r,
+		cfg:    cfg,
 	}
 }
 

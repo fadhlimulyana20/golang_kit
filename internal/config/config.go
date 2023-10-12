@@ -1,13 +1,16 @@
 package config
 
-type pagination struct {
-	PageLimit int
-	Page      int
-}
+import (
+	mail "template/utils/mailer"
+	"template/utils/minio"
 
-var Pagination = pagination{
-	PageLimit: 25,
-	Page:      1,
-}
+	"gorm.io/gorm"
+)
 
-var SMTPFrom = "Mail <no_reply@smail.id>"
+type Config struct {
+	ENV    string
+	DB     *gorm.DB
+	SMTP   *mail.Mailer
+	Secret string
+	Minio  minio.MinioStorageContract
+}

@@ -6,6 +6,7 @@ import (
 	"template/database"
 	h "template/internal/server/http"
 	mail "template/utils/mailer"
+	"template/utils/minio"
 
 	"github.com/spf13/cobra"
 )
@@ -19,12 +20,10 @@ func StartServer(ctx context.Context, port int) {
 
 	secretKey := config.NewSecretCfg().Load()
 
-	ht := h.NewServer(&h.HttpServerCfg{
-		DB:        db,
-		SMTP:      *smtp,
-		Secret:    secretKey.Key,
-		AesSecret: secretKey.AesKey,
-	})
+	minioConfig := config.NewMinioCfg().Load()
+	minio := minio.NewMinioStorage(minioConfig.Endpoint, minioConfig.AccessKeyID, minioConfig.SecretAccessKey, minioConfig.BucketName, minioConfig.UseSSL)
+
+	ht := h.NewServer(config.Env(), db, *smtp, secretKey.Key, minio)
 	defer ht.Done()
 	ht.Run(ctx, port)
 
