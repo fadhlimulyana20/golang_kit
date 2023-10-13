@@ -1,0 +1,49 @@
+package repository
+
+import (
+	"context"
+	"template/database"
+	"template/internal/entities"
+	"time"
+
+	"github.com/sirupsen/logrus"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+)
+
+type Nosql struct {
+	mongo database.MongoDB
+	name  string
+}
+
+type NoSQLInf interface {
+	InsertOne(nosql entities.Nosql) (entities.Nosql, error)
+}
+
+func NewNoSQLInf(mongo database.MongoDB) NoSQLInf {
+	return &Nosql{
+		mongo: mongo,
+		name:  "No SQL",
+	}
+}
+
+func (n *Nosql) InsertOne(nosql entities.Nosql) (entities.Nosql, error) {
+	nosql.ID = primitive.NewObjectID()
+
+	db, client, err := n.mongo.Database()
+	if err != nil {
+		logrus.Errorf("[%s][InsertOne][Error]", n.name)
+		return nosql, err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+	defer cancel()
+	_, err = db.Collection("nosql").InsertOne(ctx, nosql)
+	defer n.mongo.Close(ctx, client)
+
+	if err != nil {
+		logrus.Errorf("[%s][InsertOne][Error]", n.name)
+		return nosql, err
+	}
+
+	return nosql, nil
+}

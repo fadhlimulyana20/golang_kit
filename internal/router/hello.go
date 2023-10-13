@@ -15,3 +15,10 @@ func (rtr *router) helloRouter() http.Handler {
 	hello.Post("/upload", uploadHandler.Upload)
 	return hello
 }
+
+func (rtr *router) nosqlRouter() http.Handler {
+	nosqlHandler := handler.NewNoSQLHandler(rtr.cfg.Mongo)
+	nosql := chi.NewRouter()
+	nosql.Post("/", nosqlHandler.Insert)
+	return nosql
+}

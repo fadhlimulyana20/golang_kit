@@ -1,6 +1,7 @@
 package config
 
 import (
+	"template/database"
 	mail "template/utils/mailer"
 	"template/utils/minio"
 
@@ -13,4 +14,5 @@ type Config struct {
 	SMTP   *mail.Mailer
 	Secret string
 	Minio  minio.MinioStorageContract
+	Mongo  database.MongoDB
 }

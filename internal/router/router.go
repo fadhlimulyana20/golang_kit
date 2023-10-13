@@ -60,6 +60,7 @@ func (rtr *router) Route() http.Handler {
 	})
 
 	rtr.router.Mount("/hello", rtr.helloRouter())
+	rtr.router.Mount("/nosql", rtr.nosqlRouter())
 	rtr.router.Mount("/admin/v1", rtr.AdminRouterV1())
 
 	return rtr.router

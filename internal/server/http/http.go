@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"template/database"
 	"template/internal/config"
 	"template/internal/router"
 	"template/utils/mailer"
@@ -19,7 +20,7 @@ type httpServer struct {
 	router http.Handler
 }
 
-func NewServer(env string, db *gorm.DB, smtp mailer.Mailer, secretKey string, minio minio.MinioStorageContract) Server {
+func NewServer(env string, db *gorm.DB, smtp mailer.Mailer, secretKey string, minio minio.MinioStorageContract, mongo database.MongoDB) Server {
 	// Init Config
 	cfg := &config.Config{
 		ENV:    env,
@@ -27,6 +28,7 @@ func NewServer(env string, db *gorm.DB, smtp mailer.Mailer, secretKey string, mi
 		SMTP:   &smtp,
 		Secret: secretKey,
 		Minio:  minio,
+		Mongo:  mongo,
 	}
 
 	// Create new router

@@ -23,7 +23,10 @@ func StartServer(ctx context.Context, port int) {
 	minioConfig := config.NewMinioCfg().Load()
 	minio := minio.NewMinioStorage(minioConfig.Endpoint, minioConfig.AccessKeyID, minioConfig.SecretAccessKey, minioConfig.BucketName, minioConfig.UseSSL)
 
-	ht := h.NewServer(config.Env(), db, *smtp, secretKey.Key, minio)
+	mongoConfig := config.NewMongoConfig().Load()
+	mongo := database.NewMongoDB(mongoConfig.Host, mongoConfig.Port, mongoConfig.User, mongoConfig.Password, mongoConfig.Database)
+
+	ht := h.NewServer(config.Env(), db, *smtp, secretKey.Key, minio, mongo)
 	defer ht.Done()
 	ht.Run(ctx, port)
 
