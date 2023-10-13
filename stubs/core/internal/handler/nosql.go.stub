@@ -1,0 +1,57 @@
+package handler
+
+import (
+	"fmt"
+	"net/http"
+	"{{.Module}}/database"
+	"{{.Module}}/internal/appctx"
+	"{{.Module}}/internal/params"
+	"{{.Module}}/internal/usecase"
+	"{{.Module}}/utils/json"
+	"{{.Module}}/utils/validator"
+	"time"
+
+	"github.com/sirupsen/logrus"
+)
+
+type nosqlHandler struct {
+	usecase usecase.NosqlUsecase
+	name    string
+	handler Handler
+}
+
+type NoSQLHandler interface {
+	Insert(w http.ResponseWriter, r *http.Request)
+}
+
+func NewNoSQLHandler(mongo database.MongoDB) NoSQLHandler {
+	return &nosqlHandler{
+		usecase: usecase.NewNoSqlUsecase(mongo),
+		name:    "NoSQLHandler",
+	}
+}
+
+func (n *nosqlHandler) Insert(w http.ResponseWriter, r *http.Request) {
+	logrus.Info(fmt.Sprintf("[%s][Insert] is executed", n.name))
+	startTime := time.Now()
+
+	var param params.CreateNosqlParam
+	ctx := appctx.NewResponse()
+
+	if err := json.Decode(r.Body, &param); err != nil {
+		logrus.Error("Cannot decode json")
+		ctx = ctx.WithErrors(err.Error()).WithCode(http.StatusBadRequest)
+		n.handler.Response(w, *ctx, startTime, time.Now())
+		return
+	}
+
+	if err := validator.Validate(param); err != nil {
+		logrus.Error(err.Error())
+		ctx = ctx.WithErrors(err.Error())
+		n.handler.Response(w, *ctx, startTime, time.Now())
+		return
+	}
+
+	resp := n.usecase.Insert(param)
+	n.handler.Response(w, resp, startTime, time.Now())
+}

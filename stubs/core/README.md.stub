@@ -22,3 +22,4 @@ The project documentation can be found in this [link](https://fadhlimulyana.noti
 
 ## Supported DB
 - Postgres
+- MongoDB

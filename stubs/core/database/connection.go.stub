@@ -45,7 +45,8 @@ func (s *sqlDBStruct) DSN() string {
 	if s.driver == "postgres" {
 		dsn = fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", s.host, s.port, s.user, s.password, s.database)
 	} else if s.driver == "mysql" {
-		dsn = fmt.Sprintf("mysql://%s:%s@%s:%s/%s", s.user, s.password, s.host, s.port, s.database)
+		// Refer to https://github.com/go-sql-driver/mysql#dsn-data-source-name
+		dsn = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", s.user, s.password, s.host, s.port, s.database)
 	} else {
 		log.Panic("Driver is not supported")
 	}
