@@ -4,8 +4,6 @@ import (
 	"context"
 	"testing"
 	"time"
-
-	"go.mongodb.org/mongo-driver/bson"
 )
 
 var (
@@ -15,6 +13,10 @@ var (
 	mongoPassword = "password"
 	mongoDatabase = "test_go_kit"
 )
+
+type testMongoStruct struct {
+	Hello string `bson:"hello"`
+}
 
 func TestConn(t *testing.T) {
 	mongoDB := NewMongoDB(mongoHost, mongoPort, mongoUser, mongoPassword, mongoDatabase)
@@ -36,7 +38,10 @@ func TestInsertOne(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	_, err = db.Collection("testing").InsertOne(ctx, bson.D{{"hello", "world"}})
+	test := testMongoStruct{
+		Hello: "World",
+	}
+	_, err = db.Collection("testing").InsertOne(ctx, test)
 	if err != nil {
 		t.Fatal(err)
 	}
