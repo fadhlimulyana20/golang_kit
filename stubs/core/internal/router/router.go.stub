@@ -33,7 +33,7 @@ func NewRouter(cfg *config.Config) Router {
 }
 
 func (rtr *router) Route() http.Handler {
-	rtr.router.Use(m.Cors(rtr.cfg.DB))
+	rtr.router.Use(m.Cors)
 	rtr.router.Use(m.Logger)
 	rtr.router.Use(m.Recovery)
 	rtr.router.Use(m.Authorization(rtr.cfg.DB))
